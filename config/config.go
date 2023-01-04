@@ -1,14 +1,10 @@
 package config
 
 type Config struct {
-	Server   ServerConfig
-	Database DatabaseConfig
+	Server ServerConfig
 }
 
 type ServerConfig struct {
 	Host string
 	Port string
-}
-
-type DatabaseConfig struct {
 }
