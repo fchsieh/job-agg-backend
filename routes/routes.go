@@ -11,16 +11,6 @@ import (
 	"go.mongodb.org/mongo-driver/mongo"
 )
 
-type Job struct {
-	company_name string
-	date_posted  string
-	job_title    string
-	job_id       string
-	job_link     string
-	job_location string
-	source       string
-}
-
 func GetJobs(c *gin.Context, fb *firestore.Client, mongo *mongo.Database) {
 	c.JSON(200, gin.H{
 		"message": "jobs",

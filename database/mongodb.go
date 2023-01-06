@@ -34,7 +34,6 @@ func FetchMongoJobsByDate(conf config.Config, mongo *mongo.Database, date time.T
 		"date_posted": date.Format("2006-01-02"),
 	})
 	if err != nil {
-		log.Fatalln(err)
 		return nil, err
 	}
 
@@ -44,22 +43,27 @@ func FetchMongoJobsByDate(conf config.Config, mongo *mongo.Database, date time.T
 		return results, err
 	} else {
 		for cur.Next(context.TODO()) {
-			var result interface{}
+			var result config.Job
 			err := cur.Decode(&result)
-			if err != nil {
+			if err != nil { // failed to decode from mongo
 				log.Fatalln(err)
 			}
 			results = append(results, result)
 		}
 	}
-
 	return results, nil
 }
 
 func SaveJobsToMongo(conf config.Config, mongo *mongo.Database, date time.Time, jobs []interface{}) error {
 	coll := mongo.Collection(conf.Database.Collection)
-	_, err := coll.InsertMany(context.TODO(), jobs)
-	if err != nil {
+	var jobsToSave []interface{}
+	for _, job := range jobs {
+		job := job.(map[string]interface{})
+		job["date_posted"] = date.Format("2006-01-02")
+		jobsToSave = append(jobsToSave, job)
+	}
+	_, err := coll.InsertMany(context.TODO(), jobsToSave)
+	if err != nil { // failed to insert to mongo
 		log.Fatalln(err)
 		return err
 	}

@@ -1,5 +1,15 @@
 package config
 
+type Job struct {
+	Company_name string `json:"company_name"`
+	Date_posted  string `json:"date_posted"`
+	Job_title    string `json:"job_title"`
+	Job_id       string `json:"_id"`
+	Job_link     string `json:"job_link"`
+	Job_location string `json:"job_location"`
+	Source       string `json:"source"`
+}
+
 type Config struct {
 	Server   ServerConfig
 	Database DatabaseConfig

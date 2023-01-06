@@ -37,7 +37,6 @@ func FetchFirebaseJobsByDate(conf config.Config, fb *firestore.Client, date time
 	// Construct a query to fetch the jobs for the given date
 	data, err := fb.Collection(conf.Database.Collection).Doc(date.Format("2006-01-02")).Get(context.Background())
 	if err != nil {
-		log.Fatalln(err)
 		return nil, err
 	}
 	jobs := data.Data()[conf.Database.Document]
