@@ -1,1 +1,7 @@
-# job-list-backend
+# Job-Agg Backend
+
+## Start
+
+```
+go run ./main.go
+```
