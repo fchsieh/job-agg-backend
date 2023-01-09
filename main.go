@@ -2,6 +2,7 @@ package main
 
 import (
 	"log"
+	"time"
 
 	"github.com/fchsieh/job-list-backend/config"
 	"github.com/fchsieh/job-list-backend/database"
@@ -55,8 +56,33 @@ func set_router(conf config.Config) *gin.Engine {
 	return router
 }
 
+func del_old_data(conf config.Config) {
+	if !conf.Server.DeleteOldData {
+		return
+	}
+	// delete data older than * days
+	to_del := time.Now().AddDate(0, 0, -conf.Server.DeleteOldDataAfterDays)
+
+	for {
+		time.Sleep(24 * time.Hour)
+		err := database.DeleteFirebaseOldData(conf, database.FirebaseInit(conf), to_del)
+		if err != nil {
+			panic(err)
+		} else {
+			log.Println("Deleted old data")
+		}
+		err = database.DeleteMongoOldData(conf, database.MongoInit(conf), to_del)
+		if err != nil {
+			panic(err)
+		} else {
+			log.Println("Deleted old data")
+		}
+	}
+}
+
 func main() {
 	conf := read_config()
+	go del_old_data(conf)
 	router := set_router(conf)
 	router.Run(conf.Server.Host + ":" + conf.Server.Port)
 }

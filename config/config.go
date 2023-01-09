@@ -25,8 +25,10 @@ type DatabaseConfig struct {
 }
 
 type ServerConfig struct {
-	Host string
-	Port string
+	Host                   string
+	Port                   string
+	DeleteOldData          bool `mapstructure:"delete_old_data"`
+	DeleteOldDataAfterDays int  `mapstructure:"delete_old_data_after"`
 }
 
 type FirebaseConfig struct {

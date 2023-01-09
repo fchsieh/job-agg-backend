@@ -70,3 +70,14 @@ func SaveJobsToMongo(conf config.Config, mongo *mongo.Database, date time.Time, 
 
 	return nil
 }
+
+func DeleteMongoOldData(conf config.Config, mongo *mongo.Database, date time.Time) error {
+	coll := mongo.Collection(conf.Database.Collection)
+	_, err := coll.DeleteMany(context.TODO(), map[string]interface{}{
+		"date_posted": date.Format("2006-01-02"),
+	})
+	if err != nil {
+		return err
+	}
+	return nil
+}

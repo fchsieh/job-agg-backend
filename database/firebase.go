@@ -44,3 +44,12 @@ func FetchFirebaseJobsByDate(conf config.Config, fb *firestore.Client, date time
 	fbJobs := jobs.([]interface{})
 	return fbJobs, nil
 }
+
+func DeleteFirebaseOldData(conf config.Config, fb *firestore.Client, date time.Time) error {
+	// Construct a query to fetch the jobs for the given date
+	_, err := fb.Collection(conf.Database.Collection).Doc(date.Format("2006-01-02")).Delete(context.Background())
+	if err != nil {
+		return err
+	}
+	return nil
+}
