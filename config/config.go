@@ -37,6 +37,6 @@ type FirebaseConfig struct {
 }
 
 type MongoConfig struct {
-	URL       string
-	DockerURL string
+	LocalURI  string `mapstructure:"local_uri"`
+	DockerURI string `mapstructure:"docker_uri"`
 }

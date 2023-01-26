@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"log"
+	"os"
 	"time"
 
 	"github.com/fchsieh/job-list-backend/config"
@@ -11,23 +12,32 @@ import (
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 )
 
+func IsRunningInDocker() bool {
+	_, err := os.Stat("/.dockerenv")
+	return err == nil
+}
+
 func MongoInit(c config.Config) *mongo.Database {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	var client *mongo.Client
-	var err error
-	client, err = mongo.Connect(ctx, options.Client().ApplyURI(c.Mongo.DockerURL))
+	// Select the correct mongo URI based on whether we are running in docker or not
+	var mongoURI string
+	if IsRunningInDocker() {
+		mongoURI = c.Mongo.DockerURI
+	} else {
+		mongoURI = c.Mongo.LocalURI
+	}
+
+	client, err := mongo.Connect(ctx, options.Client().ApplyURI(mongoURI))
 	if err != nil {
-		// fallback to local mongo
-		client, err = mongo.Connect(ctx, options.Client().ApplyURI(c.Mongo.URL))
-		if err != nil {
-			log.Fatalln(err)
-		}
+		log.Println("Failed to connect to mongo")
+		log.Fatalln(err)
 	}
 
 	err = client.Ping(ctx, readpref.Primary())
 	if err != nil {
+		log.Println("Failed to ping mongo")
 		log.Fatalln(err)
 	}
 	return client.Database(c.Database.Database)
