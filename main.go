@@ -14,6 +14,7 @@ import (
 
 func read_config() config.Config {
 	viper.AddConfigPath("..")
+	viper.AddConfigPath(".") // optionally look for config in the working directory
 	viper.SetConfigName("config")
 	viper.SetConfigType("toml")
 	var conf config.Config

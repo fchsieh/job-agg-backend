@@ -15,9 +15,15 @@ func MongoInit(c config.Config) *mongo.Database {
 	ctx, cancel := context.WithTimeout(context.Background(), 10*time.Second)
 	defer cancel()
 
-	client, err := mongo.Connect(ctx, options.Client().ApplyURI(c.Mongo.URL))
+	var client *mongo.Client
+	var err error
+	client, err = mongo.Connect(ctx, options.Client().ApplyURI(c.Mongo.DockerURL))
 	if err != nil {
-		log.Fatalln(err)
+		// fallback to local mongo
+		client, err = mongo.Connect(ctx, options.Client().ApplyURI(c.Mongo.URL))
+		if err != nil {
+			log.Fatalln(err)
+		}
 	}
 
 	err = client.Ping(ctx, readpref.Primary())

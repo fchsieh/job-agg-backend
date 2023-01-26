@@ -3,6 +3,7 @@ package database
 import (
 	"context"
 	"log"
+	"os"
 	"time"
 
 	"cloud.google.com/go/firestore"
@@ -17,7 +18,16 @@ func FirebaseInit(c config.Config) *firestore.Client {
 	conf := &firebase.Config{
 		DatabaseURL: c.Firebase.URL,
 	}
-	opt := option.WithCredentialsFile("../firebase.json")
+	if _, err := os.Stat(c.Firebase.Credentials); os.IsNotExist(err) {
+		if _, err := os.Stat("../" + c.Firebase.Credentials); os.IsNotExist(err) {
+			log.Fatalln(err)
+		}
+		// copy the file to the current directory
+		if err := os.Link("../"+c.Firebase.Credentials, c.Firebase.Credentials); err != nil {
+			log.Fatalln(err)
+		}
+	}
+	opt := option.WithCredentialsFile(c.Firebase.Credentials)
 	app, err := firebase.NewApp(ctx, conf, opt)
 	if err != nil {
 		log.Fatalln(err)

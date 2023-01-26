@@ -37,5 +37,6 @@ type FirebaseConfig struct {
 }
 
 type MongoConfig struct {
-	URL string
+	URL       string
+	DockerURL string
 }
